@@ -1,5 +1,6 @@
 package com.example.demo.controllers;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.example.demo.entities.Post;
 import com.example.demo.services.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
