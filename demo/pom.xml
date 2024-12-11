@@ -36,6 +36,11 @@
     <artifactId>spring-boot-starter-parent</artifactId>
     <version>3.6.3</version>
 </parent>
+        <dependency>
+    <groupId>org.apache.poi</groupId>
+    <artifactId>poi-ooxml</artifactId>
+    <version>5.2.3</version>
+</dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

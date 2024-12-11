@@ -92,4 +92,21 @@ public class PostController {
             return ResponseEntity.status(500).build();
         }
     }
+
+    /**
+     * Создание отчета о постах в формате XLS
+     */
+    @GetMapping("/report")
+    public ResponseEntity<?> generatePostsReport() {
+        try {
+            String filePath = "posts_report.xlsx";
+            logger.info("Generating report for posts at path: {}", filePath);
+            postService.generatePostsReport(filePath);
+            logger.info("Report generated successfully at path: {}", filePath);
+            return ResponseEntity.ok("Report generated successfully at: " + filePath);
+        } catch (Exception e) {
+            logger.error("Error generating posts report: ", e);
+            return ResponseEntity.status(500).body("Error generating posts report");
+        }
+    }
 }

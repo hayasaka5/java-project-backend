@@ -2,11 +2,17 @@ package com.example.demo.services;
 
 import com.example.demo.entities.Post;
 import com.example.demo.repositories.PostRepository;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -87,5 +93,42 @@ public class PostService {
     private boolean checkSubscription(Long userId) {
         logger.info("Simulating subscription check for user with ID: {}", userId);
         return true;
+    }
+
+    public void generatePostsReport(String filePath) {
+        logger.info("Generating XLS report for all posts");
+
+        List<Post> posts = postRepository.findAll();
+
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Posts Report");
+
+            // Header row
+            Row headerRow = sheet.createRow(0);
+            headerRow.createCell(0).setCellValue("ID");
+            headerRow.createCell(1).setCellValue("Title");
+            headerRow.createCell(2).setCellValue("Content");
+            headerRow.createCell(3).setCellValue("Created At");
+
+            // Data rows
+            int rowNum = 1;
+            for (Post post : posts) {
+                Row row = sheet.createRow(rowNum++);
+                row.createCell(0).setCellValue(post.getId());
+                row.createCell(1).setCellValue(post.getTitle());
+                row.createCell(2).setCellValue(post.getContent());
+                row.createCell(3).setCellValue(post.getCreatedAt().toString());
+            }
+
+            // Write to file
+            try (FileOutputStream fileOut = new FileOutputStream(filePath)) {
+                workbook.write(fileOut);
+            }
+
+            logger.info("XLS report generated successfully at: {}", filePath);
+        } catch (IOException e) {
+            logger.error("Error generating XLS report: {}", e.getMessage(), e);
+            throw new RuntimeException("Error generating XLS report", e);
+        }
     }
 }
