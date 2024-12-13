@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 @RestController
 @RequestMapping("/api/posts")
 public class PostController {
@@ -24,8 +29,18 @@ public class PostController {
     }
 
     /**
-     * Создание нового поста
+     * Create a new post.
      */
+    @Operation(
+            summary = "Create a new post",
+            description = "Creates a new post with the provided data.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Post created successfully", 
+                            content = @Content(mediaType = "application/json", 
+                            schema = @Schema(implementation = Post.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
     @PostMapping
     public ResponseEntity<Post> createPost(@RequestBody Post post) {
         try {
@@ -40,8 +55,25 @@ public class PostController {
     }
 
     /**
-     * Редактирование поста
+     * Edit an existing post.
      */
+    @Operation(
+            summary = "Edit a post",
+            description = "Edits an existing post based on the provided post ID and updated data.",
+            parameters = {
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "postId",
+                            description = "The unique ID of the post to edit",
+                            required = true
+                    )
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Post updated successfully",
+                            content = @Content(mediaType = "application/json", 
+                            schema = @Schema(implementation = Post.class))),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
     @PutMapping("/{postId}")
     public ResponseEntity<Post> editPost(@PathVariable Long postId, @RequestBody Post updatedPost) {
         try {
@@ -56,8 +88,23 @@ public class PostController {
     }
 
     /**
-     * Удаление поста
+     * Delete a post by its ID.
      */
+    @Operation(
+            summary = "Delete a post",
+            description = "Deletes a post identified by the provided post ID.",
+            parameters = {
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "postId",
+                            description = "The unique ID of the post to delete",
+                            required = true
+                    )
+            },
+            responses = {
+                    @ApiResponse(responseCode = "204", description = "Post deleted successfully"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
     @DeleteMapping("/{postId}")
     public ResponseEntity<?> deletePost(@PathVariable Long postId) {
         try {
@@ -72,8 +119,26 @@ public class PostController {
     }
 
     /**
-     * Получение постов пользователя, если подписка активна
+     * Fetch posts of a specific user if the subscription is active.
      */
+    @Operation(
+            summary = "Fetch user posts",
+            description = "Fetch posts of a user only if their subscription is active.",
+            parameters = {
+                    @io.swagger.v3.oas.annotations.Parameter(
+                            name = "userId",
+                            description = "The unique ID of the user whose posts are to be fetched",
+                            required = true
+                    )
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Successfully fetched posts",
+                            content = @Content(mediaType = "application/json", 
+                            schema = @Schema(implementation = List.class))),
+                    @ApiResponse(responseCode = "403", description = "No active subscription found or no posts exist"),
+                    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            }
+    )
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Post>> getUserPosts(@PathVariable Long userId) {
         try {
@@ -94,8 +159,16 @@ public class PostController {
     }
 
     /**
-     * Создание отчета о постах в формате XLS
+     * Generate a report of posts in XLS format.
      */
+    @Operation(
+            summary = "Generate posts report",
+            description = "Generates a report of all posts in XLS format.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Report generated successfully"),
+                    @ApiResponse(responseCode = "500", description = "Error generating report")
+            }
+    )
     @GetMapping("/report")
     public ResponseEntity<?> generatePostsReport() {
         try {
